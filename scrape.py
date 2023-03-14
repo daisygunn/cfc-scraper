@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import json
+import string
 
 
 def scrape_html(html_page):
@@ -54,13 +55,15 @@ def get_external_sources(html_content):
 
 
 def find_privacy_policy(html_content):
-    """ Function to find Privacy policy """
+    """ Function to find Privacy policy ink """
     all_hyperlinks = html_content.find_all("a")
+
     i = 0
     while i <= len(all_hyperlinks):
         for y in all_hyperlinks:
+            # determine those with href in their attributes and add to list
             if "href" in y.attrs:
-            # determine those with search item in their search item and add to list
+                # if the word privacy is in the href then print value
                 if "privacy" in y["href"]:
                     print(f"Link number: {i}, link: '{y['href']}'")
                     privacy_link = y['href'] 
@@ -68,8 +71,27 @@ def find_privacy_policy(html_content):
     
     return privacy_link
 
+def get_word_count(privacy_policy_page):
+    # get content from privacy policy
+    privacy_policy_content = scrape_html(privacy_policy_page)
+
+    # get visible text content from the page
+    visible_text = str(privacy_policy_content.text)
+
+    # removes punctuation from text on page
+    for punctuation in string.punctuation:
+        visible_text = visible_text.replace(punctuation, '')
+
+    # calculate word count using split function 
+    word_count = len(str(visible_text).split())
+
+    privacy_data = { 'Privacy Policy page word count' : word_count }
+    print(json.dumps(privacy_data, indent=4))
+
 def run_programme():
     """ Function to run whole programme """
+    print("Programme starting")
+
     # Set html link to be scraped and call GET request
     html_link = "https://www.cfcunderwriting.com"
 
@@ -85,13 +107,9 @@ def run_programme():
     # combine the websites domain with privacy policy path
     privacy_policy_full = html_link + privacy_policy_path
 
-    # get content from privacy policy
-    privacy_policy_content = scrape_html(privacy_policy_full)
-
-    print(privacy_policy_content)
-    visible_text = (privacy_policy_content.text)
-    #words = visible_text.replace(" ", "")
-    #print(f"Word Count on Privacy Page: {word_count}")
-    print(visible_text)
+    # get word count from privacy policy page
+    get_word_count(privacy_policy_full)
+    
+    print("Programme finished.")
 
 run_programme()
