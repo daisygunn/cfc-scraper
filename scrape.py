@@ -26,6 +26,7 @@ def find_external_sources(html_content, element, search_item, contains):
             # determine those with search item in their search item and add to list
             if contains in x[search_item]:
                 external_resource_list.append(x)
+
     return external_resource_list
 
 
@@ -34,22 +35,37 @@ def get_external_sources(html_content):
     external_sources = []
     # find scripts
     scripts = find_external_sources(html_content, "script", "src", "https")
-    external_sources.append(scripts)
+    if scripts != None:
+        for x in scripts:
+            external_sources.append(x)
     # find images
     images = find_external_sources(html_content, "img", "src", "https")
-    external_sources.append(images)
+    if images != None:
+        for x in images:
+            external_sources.append(x)
     # find svgs
     svgs = find_external_sources(html_content, "svg", "src", "https")
-    external_sources.append(svgs)
+    if svgs != None:
+        for x in svgs:
+            external_sources.append(x)
+    # find hyperlinks
+    a = find_external_sources(html_content, "a", "href", "https")
+    if a != None:
+        for x in a:
+            external_sources.append(x)
     # find links
     links = find_external_sources(html_content, "link", "href", "https")
-    external_sources.append(links)
+    if links != None:
+        for x in links:
+            external_sources.append(x)
+    # find iframe
+    iframe = find_external_sources(html_content, "iframe", "src", "https")
+    if iframe != None:
+        for x in iframe:
+            external_sources.append(x)
 
-    # create data variable
-    data = {'external sources count': len(external_sources),
-            'external sources': str(external_sources)
+    data = {'external sources': str(external_sources)
             }
-
     # dump data in to json format
     external_sources_json = json.dumps(data, indent=4)
     print(external_sources_json)
@@ -67,10 +83,11 @@ def find_privacy_policy(html_content):
                 # if the word privacy is in the href then print value
                 if "privacy" in y["href"]:
                     print(f"Link number: {i}, link: '{y['href']}'")
-                    privacy_link = y['href'] 
-            i+=1
-    
+                    privacy_link = y['href']
+            i += 1
+
     return privacy_link
+
 
 def get_word_count(privacy_policy_page):
     """ Function to get word count from privacy policy page """
@@ -84,11 +101,12 @@ def get_word_count(privacy_policy_page):
     for punctuation in string.punctuation:
         visible_text = visible_text.replace(punctuation, '')
 
-    # calculate word count using split function 
+    # calculate word count using split function
     word_count = len(str(visible_text).split())
 
-    privacy_data = { 'Privacy Policy page word count' : word_count }
+    privacy_data = {'Privacy Policy page word count': word_count}
     print(json.dumps(privacy_data, indent=4))
+
 
 def run_programme():
     """ Function to run whole programme """
@@ -100,7 +118,7 @@ def run_programme():
     # pass link to scrape function
     html_scraped_content = scrape_html(html_link)
 
-    # get scripts/img/link/svgs
+    # get scripts/img/link/svgs/iframe/a
     get_external_sources(html_scraped_content)
 
     # get privacy policy link
@@ -111,7 +129,8 @@ def run_programme():
 
     # get word count from privacy policy page
     get_word_count(privacy_policy_full)
-    
+
     print("Programme finished.")
+
 
 run_programme()
