@@ -30,6 +30,7 @@ def find_external_sources(html_content, element, search_item, contains):
 
 
 def get_external_sources(html_content):
+    """ Function to get scripts/images/svgs/links """
     external_sources = []
     # find scripts
     scripts = find_external_sources(html_content, "script", "src", "https")
@@ -72,6 +73,7 @@ def find_privacy_policy(html_content):
     return privacy_link
 
 def get_word_count(privacy_policy_page):
+    """ Function to get word count from privacy policy page """
     # get content from privacy policy
     privacy_policy_content = scrape_html(privacy_policy_page)
 
